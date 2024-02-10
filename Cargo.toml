@@ -1,0 +1,15 @@
+[package]
+name = "server-imgs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+fast_image_resize = "3.0.3"
+rocket = "0.5.0"
+serde = "1.0"
+tera = { version = "1", default-features = false }
+[dependencies.rocket_dyn_templates]
+version = "0.1.0"
+features = ["handlebars", "tera"]
