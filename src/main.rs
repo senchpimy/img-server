@@ -21,7 +21,6 @@ use rocket::response::content::RawHtml;
 use rocket::{Config, State};
 
 const ROOT: &'static str = "/home/plof/Disco";
-//const ROOT: &'static str = "/home/plof/Pictures";
 #[get("/")]
 fn index(tera: &State<Tera>, pg: &State<Rw<PageContents>>) -> RawHtml<String> {
     let pg = pg.read().unwrap();
@@ -35,6 +34,9 @@ fn index(tera: &State<Tera>, pg: &State<Rw<PageContents>>) -> RawHtml<String> {
     html
 }
 
+#[get("/favicon.ico")]
+fn favicon() {}
+
 #[get("/<dir>")]
 fn index2(dir: &str, tera: &State<Tera>, pg: &State<Rw<PageContents>>) -> RawHtml<String> {
     let mut state = pg.write().unwrap();
@@ -44,6 +46,16 @@ fn index2(dir: &str, tera: &State<Tera>, pg: &State<Rw<PageContents>>) -> RawHtm
     }) {
         state.root = format!("{}/{}", &state.root, dir);
         state.file = get_vec_file(&state.root);
+    } else {
+        match state.root.split("/").find(|val| *val == dir) {
+            Some(_) => {
+                let last = state.root.split('/').last().unwrap();
+                state.root = state.root.replace(&format!("/{}", last), "");
+                dbg!(&state.root);
+                state.file = get_vec_file(&state.root);
+            }
+            None => {}
+        }
     }
     let pg = state;
     let mut ctx = Context::new();
@@ -82,7 +94,7 @@ fn rocket() -> _ {
         .configure(cfgi)
         .manage(tera)
         .manage(Rw::new(pg))
-        .mount("/", routes![index, get_file, index2])
+        .mount("/", routes![index, get_file, index2, favicon])
 }
 
 fn get_vec_file(root: &str) -> Vec<Entry> {
