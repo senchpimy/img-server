@@ -3,3 +3,6 @@ Description=Foo
 
 [Service]
 ExecStart=/bin/server-imgs
+
+[Install]
+WantedBy=multi-user.target
